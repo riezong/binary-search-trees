@@ -1,7 +1,9 @@
 import { Node } from "./node";
 
 class Tree {
-  constructor(array) {}
+  constructor(array) {
+    this.root = this.buildTree(array);
+  }
 
   root() {
     // uses the return value of buildTree
@@ -10,23 +12,29 @@ class Tree {
   buildTree(array) {
     // takes an array of data and turns it into a balanced binary tree full of Node objects appropriately placed (don’t forget to sort and remove duplicates!).
     // The buildTree function should return the level-0 root node.
-    const uniqueNumbers = array.filter(
-      (value, index, array) => array.indexOf(value) === index,
-    );
+
+    // sort and remove duplicates
+    const uniqueNumbers = [...new Set(array)]; // More concise way to get unique elements
     const sortedArray = uniqueNumbers.sort((a, b) => a - b);
-    console.log(sortedArray);
+    // console.log(sortedArray);
+
+    if (sortedArray.length === 0) return null;
 
     let start = 0;
     let end = sortedArray.length - 1;
     let mid = Math.floor((start + end) / 2);
-    console.log(start, mid, end);
+    // console.log(start, mid, end);
 
-    let value = sortedArray[mid];
-    let leftChild = sortedArray.slice(start, mid);
-    let rightChild = sortedArray.slice(mid + 1);
-    console.log(value, leftChild, rightChild);
+    let root = new Node(sortedArray[mid]);
+    // Recursively build the left and right subtrees
+    // The left child will be the root of the subtree built from the left half of the array
+    root.left = this.buildTree(sortedArray.slice(start, mid));
+    // The right child will be the root of the subtree built from the right half of the array
+    root.right = this.buildTree(sortedArray.slice(mid + 1));
 
-    return value;
+    console.log(root.left, root, root.right);
+
+    return root;
   }
 
   insert(value) {}
@@ -51,18 +59,22 @@ class Tree {
 
   rebalance() {}
 
-  // prettyPrint(node, prefix = "", isLeft = true) {
-  //   if (node === null) {
-  //     return;
-  //   }
-  //   if (node.right !== null) {
-  //     prettyPrint(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
-  //   }
-  //   console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.data}`);
-  //   if (node.left !== null) {
-  //     prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
-  //   }
-  // }
+  prettyPrint(node, prefix = "", isLeft = true) {
+    if (node === null) {
+      return;
+    }
+    if (node.right !== null) {
+      this.prettyPrint(
+        node.right,
+        `${prefix}${isLeft ? "│   " : "    "}`,
+        false,
+      );
+    }
+    console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.data}`);
+    if (node.left !== null) {
+      this.prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
+    }
+  }
 }
 
 export { Tree };
