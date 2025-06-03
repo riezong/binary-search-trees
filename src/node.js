@@ -1,20 +1,8 @@
 class Node {
-  constructor(data, leftChild, rightChild) {
+  constructor(data) {
     this.data = data;
-    this.leftChild = leftChild;
-    this.rightChild = rightChild;
-  }
-
-  data() {
-    return this.data;
-  }
-
-  leftChild() {
-    return this.leftChild;
-  }
-
-  rightChild() {
-    return this.rightChild;
+    this.left = null;
+    this.right = null;
   }
 }
 
