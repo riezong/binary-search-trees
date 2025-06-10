@@ -79,11 +79,106 @@ class Tree {
   }
 
   deleteItem(value) {
-    // has children
-    // no children
+    let currNode = this.root;
+    let parentNode = null;
+    console.log(currNode.data);
+    let counter = 1;
+
+    // Traverse the tree until you find target value
+    while (currNode.data !== value) {
+      parentNode = currNode;
+      console.log("level " + counter);
+      counter += 1;
+
+      if (value < currNode.data) {
+        currNode = currNode.left;
+      } else {
+        currNode = currNode.right;
+      }
+    }
+    // target acquired!
+    console.log("level " + counter);
+    console.log("found " + value);
+
+    console.log(parentNode);
+    console.log(currNode);
+
+    if (currNode.left === null && currNode.right === null) {
+      // delete leaf node
+      console.log("leaf node");
+      if (parentNode.left === value) {
+        console.log("value is on left");
+        parentNode.left = null;
+      } else {
+        console.log("value is on right");
+        parentNode.right = null;
+      }
+    } else if (currNode.left !== null && currNode.right !== null) {
+      // delete node with both children
+      console.log("both children");
+      // right, then left until no more left
+      let replacementNode = currNode.right;
+      console.log(replacementNode);
+      while (replacementNode.left !== null) {
+        replacementNode = replacementNode.left;
+        console.log(replacementNode);
+        return replacementNode;
+      }
+      if (parentNode.left.data === value) {
+        console.log("value is on left");
+        parentNode.left = replacementNode;
+        replacementNode.left = currNode.left;
+      } else {
+        console.log("value is on right");
+        parentNode.right = replacementNode;
+        replacementNode.left = currNode.left;
+      }
+    } else {
+      // delete node with single child
+      console.log("one child");
+      if (parentNode.left === value) {
+        console.log("value is on left");
+        if (currNode.left !== null) {
+          parentNode.left = currNode.left;
+        } else {
+          parentNode.left = currNode.right;
+        }
+      } else {
+        console.log("value is on right");
+        if (currNode.left !== null) {
+          parentNode.right = currNode.left;
+        } else {
+          parentNode.right = currNode.right;
+        }
+      }
+    }
   }
 
-  find(value) {}
+  find(value) {
+    let currNode = this.root;
+    let parentNode = null;
+    console.log(currNode.data);
+    let counter = 1;
+
+    // Traverse the tree until you find target value
+    while (currNode.data !== value) {
+      parentNode = currNode;
+      console.log("level " + counter);
+      counter += 1;
+
+      if (value < currNode.data) {
+        currNode = currNode.left;
+      } else {
+        currNode = currNode.right;
+      }
+    }
+    // target acquired!
+
+    console.log("level " + counter);
+    console.log("found " + value);
+
+    return currNode;
+  }
 
   levelOrder(callback) {}
 
