@@ -42,7 +42,7 @@ class Tree {
     console.log(currNode.data);
 
     if (currNode === null) {
-      this.root = new Node(value);
+      this.root = newNode;
       console.log(`Inserted ${value}. Tree is now root: ${this.root.data}`);
       return;
     }
@@ -66,7 +66,7 @@ class Tree {
     // After the loop, currentNode is null, meaning parentNode is the node
     // where the new node should be attached.
     // Now, attach the newNode to the correct child of parentNode.
-    if (value <= parentNode.data) {
+    if (value < parentNode.data) {
       parentNode.left = newNode;
     } else {
       parentNode.right = newNode;
@@ -79,114 +79,153 @@ class Tree {
   }
 
   deleteItem(value) {
-    let currNode = this.root;
-    let parentNode = null;
-    console.log(currNode.data);
-    let counter = 1;
+    // Start deletion from the root
+    this.root = this._deleteNode(this.root, value);
+  }
 
-    // Traverse the tree until you find target value
-    while (currNode.data !== value) {
-      parentNode = currNode;
-      console.log("level " + counter);
-      counter += 1;
-
-      if (value < currNode.data) {
-        currNode = currNode.left;
-      } else {
-        currNode = currNode.right;
-      }
+  // Helper recursive function to delete a node
+  _deleteNode(node, value) {
+    if (node === null) {
+      console.log(`Value ${value} not found.`);
+      return null; // Value not found
     }
-    // target acquired!
-    console.log("level " + counter);
-    console.log("found " + value);
 
-    console.log(parentNode);
-    console.log(currNode);
-
-    if (currNode.left === null && currNode.right === null) {
-      // delete leaf node
-      console.log("leaf node");
-      if (parentNode.left === value) {
-        console.log("value is on left");
-        parentNode.left = null;
-      } else {
-        console.log("value is on right");
-        parentNode.right = null;
-      }
-    } else if (currNode.left !== null && currNode.right !== null) {
-      // delete node with both children
-      console.log("both children");
-      // right, then left until no more left
-      let replacementNode = currNode.right;
-      console.log(replacementNode);
-      while (replacementNode.left !== null) {
-        replacementNode = replacementNode.left;
-        console.log(replacementNode);
-        return replacementNode;
-      }
-      if (parentNode.left.data === value) {
-        console.log("value is on left");
-        parentNode.left = replacementNode;
-        replacementNode.left = currNode.left;
-      } else {
-        console.log("value is on right");
-        parentNode.right = replacementNode;
-        replacementNode.left = currNode.left;
-      }
+    // Traverse to find the node to delete
+    if (value < node.data) {
+      node.left = this._deleteNode(node.left, value);
+    } else if (value > node.data) {
+      node.right = this._deleteNode(node.right, value);
     } else {
-      // delete node with single child
-      console.log("one child");
-      if (parentNode.left === value) {
-        console.log("value is on left");
-        if (currNode.left !== null) {
-          parentNode.left = currNode.left;
-        } else {
-          parentNode.left = currNode.right;
-        }
-      } else {
-        console.log("value is on right");
-        if (currNode.left !== null) {
-          parentNode.right = currNode.left;
-        } else {
-          parentNode.right = currNode.right;
-        }
+      // Node to be deleted found (value === node.data)
+
+      // Case 1: Node with no children or only one child
+      if (node.left === null) {
+        console.log(`Deleting node ${value} with no left child.`);
+        return node.right; // Return the right child (or null if no children)
+      } else if (node.right === null) {
+        console.log(`Deleting node ${value} with no right child.`);
+        return node.left; // Return the left child
       }
+
+      // Case 2: Node with two children
+      // Find the inorder successor (smallest in the right subtree)
+      console.log(`Deleting node ${value} with two children.`);
+      let tempNode = node.right;
+      while (tempNode.left !== null) {
+        tempNode = tempNode.left;
+      }
+      // Copy the inorder successor's data to this node
+      node.data = tempNode.data;
+      // Delete the inorder successor from the right subtree
+      node.right = this._deleteNode(node.right, tempNode.data);
     }
+    return node;
   }
 
   find(value) {
     let currNode = this.root;
-    let parentNode = null;
-    console.log(currNode.data);
-    let counter = 1;
 
-    // Traverse the tree until you find target value
-    while (currNode.data !== value) {
-      parentNode = currNode;
-      console.log("level " + counter);
-      counter += 1;
-
-      if (value < currNode.data) {
+    while (currNode !== null) {
+      // Loop while currNode is not null
+      if (value === currNode.data) {
+        console.log(`Found ${value}.`);
+        return currNode; // Found the node
+      } else if (value < currNode.data) {
         currNode = currNode.left;
       } else {
         currNode = currNode.right;
       }
     }
-    // target acquired!
 
-    console.log("level " + counter);
-    console.log("found " + value);
-
-    return currNode;
+    console.log(`Value ${value} not found.`);
+    return null; // Value not found
   }
 
-  levelOrder(callback) {}
+  levelOrder(callback) {
+    if (callback === undefined || typeof callback !== "function") {
+      throw new Error(
+        "A callback function is required for levelOrder traversal.",
+      );
+    }
 
-  inOrder(callback) {}
+    if (this.root === null) {
+      return;
+    }
 
-  preOrder(callback) {}
+    const queue = [];
+    queue.push(this.root);
 
-  postOrder(callback) {}
+    while (queue.length > 0) {
+      let currentNode = queue.shift();
+
+      callback(currentNode);
+
+      if (currentNode.left) {
+        queue.push(currentNode.left);
+      }
+      if (currentNode.right) {
+        queue.push(currentNode.right);
+      }
+    }
+  }
+
+  inOrder(callback) {
+    if (callback === undefined || typeof callback !== "function") {
+      throw new Error("A callback function is required for inOrder traversal.");
+    }
+
+    this._inOrderHelper(this.root, callback);
+  }
+
+  _inOrderHelper(node, callback) {
+    if (node === null) {
+      return;
+    }
+
+    this._inOrderHelper(node.left, callback);
+    callback(node);
+    this._inOrderHelper(node.right, callback);
+  }
+
+  preOrder(callback) {
+    if (callback === undefined || typeof callback !== "function") {
+      throw new Error(
+        "A callback function is required for preOrder traversal.",
+      );
+    }
+
+    this._preOrderHelper(this.root, callback);
+  }
+
+  _preOrderHelper(node, callback) {
+    if (node === null) {
+      return;
+    }
+
+    callback(node);
+    this._preOrderHelper(node.left, callback);
+    this._preOrderHelper(node.right, callback);
+  }
+
+  postOrder(callback) {
+    if (callback === undefined || typeof callback !== "function") {
+      throw new Error(
+        "A callback function is required for postOrder traversal.",
+      );
+    }
+
+    this._postOrderHelper(this.root, callback);
+  }
+
+  _postOrderHelper(node, callback) {
+    if (node === null) {
+      return;
+    }
+
+    this._postOrderHelper(node.left, callback);
+    this._postOrderHelper(node.right, callback);
+    callback(node);
+  }
 
   height(value) {}
 
