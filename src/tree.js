@@ -227,9 +227,51 @@ class Tree {
     callback(node);
   }
 
-  height(value) {}
+  height(value) {
+    let node = this.find(value);
+    let height = this._calculateHeightRecursive(node);
+    console.log(height);
+    return height;
+  }
 
-  depth(value) {}
+  _calculateHeightRecursive(node) {
+    if (node === null) {
+      return -1;
+    }
+
+    if (node.left === null && node.right === null) {
+      let height = 0;
+      return height;
+    }
+
+    let leftHeight = this._calculateHeightRecursive(node.left);
+    let rightHeight = this._calculateHeightRecursive(node.right);
+
+    return 1 + Math.max(leftHeight, rightHeight);
+  }
+
+  depth(value) {
+    let currNode = this.root;
+
+    let depth = 0;
+
+    while (currNode !== null) {
+      // Loop while currNode is not null
+      if (value === currNode.data) {
+        console.log(`Found ${value}. Depth of ${depth}`);
+        return depth; // Found the node
+      } else if (value < currNode.data) {
+        depth += 1;
+        currNode = currNode.left;
+      } else {
+        depth += 1;
+        currNode = currNode.right;
+      }
+    }
+
+    console.log(`Value ${value} not found.`);
+    return null; // Value not found
+  }
 
   isBalanced() {}
 
