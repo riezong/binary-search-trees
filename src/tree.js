@@ -273,9 +273,34 @@ class Tree {
     return null; // Value not found
   }
 
-  isBalanced() {}
+  isBalanced() {
+    let node = this.root;
+    return this._isBalancedRecursive(node);
+  }
 
-  rebalance() {}
+  _isBalancedRecursive(node) {
+    if (node === null) return true;
+
+    // Recursion
+    let leftBalanced = this._isBalancedRecursive(node.left);
+    let rightBalanced = this._isBalancedRecursive(node.right);
+
+    // Height check
+    let leftHeight = this._calculateHeightRecursive(node.left);
+    let rightHeight = this._calculateHeightRecursive(node.right);
+    let currentBalanced = Math.abs(leftHeight - rightHeight) <= 1;
+
+    return leftBalanced && rightBalanced && currentBalanced; // All three conditions must be true
+  }
+
+  rebalance() {
+    if (this.root === null) return;
+    // Flatten the tree into a sorted array
+    const sortedArray = [];
+    this.inOrder((node) => sortedArray.push(node.data));
+    // Build a new balanced tree from the sorted array
+    this.root = this.buildTree(sortedArray);
+  }
 
   prettyPrint(node, prefix = "", isLeft = true) {
     if (node === null) {
